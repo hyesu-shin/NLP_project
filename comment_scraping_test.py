@@ -6,8 +6,9 @@ import pandas as pd
 import re
 
 SCROLL_PAUSE_TIME = 0.5
+search_query = input('검색어를 입력하세요 : \n')
 
-driver = wd.Chrome("../chromedriver.exe")
+driver = wd.Chrome("chromedriver.exe")
 url = "https://www.youtube.com/watch?v=9YlFFVisCBY"
 driver.get(url)
 

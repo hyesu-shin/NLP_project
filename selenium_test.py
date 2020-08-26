@@ -57,7 +57,6 @@ for video in all_videos :
 # print(len(video_time_list))
 
 # video_time_list의 텍스트 데이터를 숫자(초)로 바꾸기
-
 def stime(text) :
     time = text.split(':')
     if len(time) == 1:
