@@ -20,7 +20,7 @@ def get_scraping_data(search_query) :
     driver.get(url)
     body = driver.find_element_by_tag_name('body')
 
-    num_of_pagedowns = 15
+    num_of_pagedowns = 30
     # 10번 밑으로 내리기
     while num_of_pagedowns :
         body.send_keys(Keys.PAGE_DOWN)
@@ -128,7 +128,7 @@ def get_scraping_data(search_query) :
 
         # 브라우저 로딩시간 기다리기
         time.sleep(1)
-        num_of_pagedowns = 1
+        num_of_pagedowns = 3
         while num_of_pagedowns :
             body.send_keys(Keys.PAGE_DOWN)
             time.sleep(0.5)
@@ -150,7 +150,7 @@ def get_scraping_data(search_query) :
 
         
         # 크롤링 --- 댓글 개수
-        comment_num = soup.find('h2',{'id':'count'},'yt-formatted-string')
+        comment_num = soup.find('yt-formatted-string',{'class':'count-text style-scope ytd-comments-header-renderer'})
         if comment_num is not None :
             comment_num_list.append(comment_num.text)
         else : comment_num_list.append(None)
