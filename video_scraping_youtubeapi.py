@@ -32,7 +32,7 @@ def get_scraping_data(search_query) :
     driver.get(url)
     body = driver.find_element_by_tag_name('body')
 
-    num_of_pagedowns = 5
+    num_of_pagedowns = 20
     # 10번 밑으로 내리기
     while num_of_pagedowns :
         body.send_keys(Keys.PAGE_DOWN)
@@ -191,7 +191,7 @@ video_list = pd.DataFrame({
     'tag' : []
 })
 
-search_keywords = ['game']
+search_keywords = ['game', 'music', 'food']
 
 for keyword in search_keywords :
     keyword_video_data = get_scraping_data(keyword)
@@ -201,4 +201,4 @@ for keyword in search_keywords :
     keyword_video_data = []
 
 print(video_list.head())
-video_list.to_csv('video_list_test_game1.csv')
+video_list.to_csv('video_list_multi.csv')
