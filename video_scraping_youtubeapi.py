@@ -8,31 +8,32 @@ import pandas as pd
 import re
 import sys
 
-# 셀레니움 작동을 위한 코드
-delay = 0.5
-driver = wd.Chrome("chromedriver.exe")
-driver.implicitly_wait(delay)
-driver.maximize_window()
-
 # 스크롤링을 위한 코드
 # YOUTUBE_IN_LINK = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&maxResults=100&order=relevance&pageToken={pageToken}&videoId={videoId}&key={key}'
-YOUTUBE_VIDEO_LINK = 'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={videoId}&key={key}'
-YOUTUBE_VIDEO_LINK_FOR_TAG = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id={videoId}&key={key}'
-key = 'AIzaSyDHu-XQGkZwKC9NZ1RcGRxn6USgiuDiCNw'
 
 # view_count = page_info['items']['viewCount']
 # print(view_count)
 
+
 # 검색 목록에서 url을 얻어오자 - 셀레니움
 def get_scraping_data(search_query) :
+
+    # 셀레니움 작동을 위한 코드
+    delay = 0.5
+    driver = wd.Chrome("chromedriver.exe")
+    driver.implicitly_wait(delay)
+    driver.maximize_window()
     # 기본 바탕이 되는 url
+    YOUTUBE_VIDEO_LINK_FOR_TAG = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id={videoId}&key={key}'
+    YOUTUBE_VIDEO_LINK = 'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={videoId}&key={key}'
+    key = 'AIzaSyDHu-XQGkZwKC9NZ1RcGRxn6USgiuDiCNw'
     base_url = 'http://www.youtube.com/results?search_query='
     url = base_url + search_query
 
     driver.get(url)
     body = driver.find_element_by_tag_name('body')
 
-    num_of_pagedowns = 20
+    num_of_pagedowns = 10
     # 10번 밑으로 내리기
     while num_of_pagedowns :
         body.send_keys(Keys.PAGE_DOWN)
@@ -52,7 +53,7 @@ def get_scraping_data(search_query) :
             title_list.append(title.text)
         else : title_list.append(None)
 
-    print(title_list)
+    # print(title_list)
     # print(len(title_list))
 
     # 크롤링 --- 재생 시간 조회
@@ -116,6 +117,9 @@ def get_scraping_data(search_query) :
             video_url_list.append(str(video_url).replace('/watch?v=',''))
         else : video_url_list.append(None)
     print(video_url_list)
+    
+    driver.implicitly_wait(delay)
+    driver.close()
 
     comment_count_list = []
     like_count_list = []
@@ -124,40 +128,41 @@ def get_scraping_data(search_query) :
     video_tag_list = []
 
     for videoId in video_url_list:
-        video_info = requests.get(YOUTUBE_VIDEO_LINK.format(videoId = videoId, key = key))
+
+        video_info = requests.get(YOUTUBE_VIDEO_LINK.format(videoId=videoId, key=key))
         video_info = video_info.json()
 
         video_info_for_tag = requests.get(YOUTUBE_VIDEO_LINK_FOR_TAG.format(videoId=videoId, key=key))
         video_info_for_tag = video_info_for_tag.json()
 
-        view_count = video_info['items'][0]['statistics']['viewCount']
-        like_count = video_info['items'][0]['statistics']['likeCount']
-        dislike_count = video_info['items'][0]['statistics']['dislikeCount']
-        comment_count = video_info['items'][0]['statistics']
-        tag = video_info_for_tag['items'][0]['snippet']['description']
-        p = re.compile('commentCount.*')
-        matched = p.findall(str(comment_count))
+        if video_info['items'][0]['statistics'].get('viewCount') :
+            view_count = video_info['items'][0]['statistics']['viewCount']
+        else : view_count = None
 
-        if comment_count is not None :
-            comment_count_list.append(matched)
-        else : comment_count_list.append(None)
+        if video_info['items'][0]['statistics'].get('likeCount') :
+            like_count = video_info['items'][0]['statistics']['likeCount']
+        else : like_count = None
 
-        if dislike_count is not None :
-            dislike_count_list.append(dislike_count)
-        else : dislike_count_list.append(None)
-
-        if like_count is not None :
-            like_count_list.append(like_count)
-        else : like_count_list.append(None)
-
-        if view_count is not None :
-            view_count_list.append(view_count)
-        else : view_count_list.append(None)
-
-        if tag is not None :
-            video_tag_list.append(tag)
-        else : video_tag_list.append(None)
+        if video_info['items'][0]['statistics'].get('dislikeCount') :
+            dislike_count = video_info['items'][0]['statistics']['dislikeCount']
+        else : dislike_count = None
         
+        if video_info['items'][0]['statistics'].get('commentCount') :
+            comment_count = video_info['items'][0]['statistics']['commentCount']
+        else : comment_count = None
+        
+        if video_info_for_tag['items'][0]['snippet'].get('tags') :
+            tag = video_info_for_tag['items'][0]['snippet']['tags']
+        else : tag = None
+        # p = re.compile('commentCount.*')
+        # matched = p.findall(str(comment_count))
+
+        comment_count_list.append(comment_count)
+        dislike_count_list.append(dislike_count)
+        like_count_list.append(like_count)
+        view_count_list.append(view_count)
+        video_tag_list.append(tag)
+
     video_info_list = []
 
     for i in range(len(title_list)) :
@@ -191,7 +196,7 @@ video_list = pd.DataFrame({
     'tag' : []
 })
 
-search_keywords = ['game', 'music', 'food']
+search_keywords = ['리그오브레전드', '메이플스토리', '던전앤파이터', '피파']
 
 for keyword in search_keywords :
     keyword_video_data = get_scraping_data(keyword)
@@ -201,4 +206,4 @@ for keyword in search_keywords :
     keyword_video_data = []
 
 print(video_list.head())
-video_list.to_csv('video_list_multi.csv')
+video_list.to_csv('video_list_game_korean.csv')
