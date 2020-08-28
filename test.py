@@ -3,6 +3,8 @@ import requests
 import re
 import json
 
+##### 제이슨 파싱해서 뽑아본 내용 #####
+
 headers = {
     'authority': 'www.youtube.com',
     'cache-control': 'max-age=0',
