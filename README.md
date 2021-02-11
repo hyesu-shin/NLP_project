@@ -1,1 +1,3 @@
-# NLP_project
+# NLP Project
+
+## 인공지능 사관학교 자연어 처리 미니 
