@@ -26,18 +26,18 @@ def get_scraping_data(search_query) :
     # 기본 바탕이 되는 url
     YOUTUBE_VIDEO_LINK_FOR_TAG = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id={videoId}&key={key}'
     YOUTUBE_VIDEO_LINK = 'https://www.googleapis.com/youtube/v3/videos?part=statistics&id={videoId}&key={key}'
-    key = 'AIzaSyDHu-XQGkZwKC9NZ1RcGRxn6USgiuDiCNw'
+    key = 'AIzaSyDyNcGwcjYJ18J2M7fadsJLrJoerCpU5YY'
     base_url = 'http://www.youtube.com/results?search_query='
     url = base_url + search_query
 
     driver.get(url)
     body = driver.find_element_by_tag_name('body')
 
-    num_of_pagedowns = 10
+    num_of_pagedowns = 200
     # 10번 밑으로 내리기
     while num_of_pagedowns :
         body.send_keys(Keys.PAGE_DOWN)
-        time.sleep(1)
+        time.sleep(2)
         num_of_pagedowns -= 1
 
     page = driver.page_source
@@ -196,7 +196,7 @@ video_list = pd.DataFrame({
     'tag' : []
 })
 
-search_keywords = ['리그오브레전드', '메이플스토리', '던전앤파이터', '피파']
+search_keywords = ['게임', '요리', '영화', '음악', '운동', '여행', '독서', '예능', '드라마', '만화']
 
 for keyword in search_keywords :
     keyword_video_data = get_scraping_data(keyword)
@@ -206,4 +206,4 @@ for keyword in search_keywords :
     keyword_video_data = []
 
 print(video_list.head())
-video_list.to_csv('video_list_game_korean.csv')
+video_list.to_csv('video_list_total_korean.csv')

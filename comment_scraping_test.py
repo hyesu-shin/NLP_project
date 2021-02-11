@@ -6,7 +6,7 @@ import pandas as pd
 import re
 
 SCROLL_PAUSE_TIME = 0.5
-search_query = input('검색어를 입력하세요 : \n')
+# search_query = input('검색어를 입력하세요 : \n')
 
 driver = wd.Chrome("chromedriver.exe")
 url = "https://www.youtube.com/watch?v=9YlFFVisCBY"
@@ -18,7 +18,7 @@ while True :
     # 현재 화면의 길이를 리턴 받아 last_height에 넣기
     last_height = driver.execute_script('return document.documentElement.scrollHeight')
 
-    for i in range(10) :
+    for i in range(5) :
         # body 본문에 END키를 입력(스크롤 내림)
         body.send_keys(Keys.END)
         time.sleep(SCROLL_PAUSE_TIME)
@@ -79,4 +79,4 @@ dict_youtube_comment = {
 }
 
 youtube_comment = pd.DataFrame(dict_youtube_comment)
-# print(youtube_comment)
+print(youtube_comment)
